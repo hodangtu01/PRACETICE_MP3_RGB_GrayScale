@@ -1,0 +1,66 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace PRACTICE_MP3_ChuyenAnhMauRGB_MucXam
+{
+    public partial class Form1 : Form
+    {
+        public Form1()
+        {
+            InitializeComponent();
+            // Load hình .jpg từ file
+            Bitmap hinhgoc = new Bitmap(@"C:\Users\ADMIN\Pictures\bird.jpg");
+
+            // Cho hình hiển thị lên pictureBox
+            picBox_HinhGoc.Image = hinhgoc;
+
+            // Bước 2: Tách ảnh màu, lấy giá trị điểm ảnh dùng vòng for và color để lấy giá trị pixel các ảnh màu R, G, B
+            // Tạo 1 biến 'Hinhmucxam' có cùng chiều rộng, chiều cao của biến 'hinhgoc' chứa hình gốc
+            // hinhgoc.Width    - Lấy chiều rộng của biến 'hinhgoc' chứa ảnh gốc (tính bằng pixel)
+            // hinhgoc.Height   - Lấy chiều cao của biến 'hinhgoc' chứa ảnh gốc (tính bằng pixel)
+            Bitmap Hinhmucxam1 = new Bitmap(hinhgoc.Width, hinhgoc.Height);
+            Bitmap Hinhmucxam2 = new Bitmap(hinhgoc.Width, hinhgoc.Height);
+            Bitmap Hinhmucxam3 = new Bitmap(hinhgoc.Width, hinhgoc.Height);
+
+            // Ảnh là một mảng hai chiều tạo 2 vòng for để quét các điểm ảnh, lấy giá trị của các điểm ảnh dùng color để phủ màu
+            // chú ý thứ tự quét ảnh
+            for (int x = 0; x < hinhgoc.Width; x++)
+                for (int y = 0; y < hinhgoc.Height; y++)
+                {
+                    // Color trong C# chứa bốn kênh R, G, B, A - độ trong suốt
+                    Color pixel = hinhgoc.GetPixel(x, y);
+                    Byte R = pixel.R;
+                    Byte G = pixel.G;
+                    Byte B = pixel.B;
+
+                    // Tính giá trị mức xám cho điểm ảnh tại (x,y) theo phương pháp Luminance // Linear Luminance độ sáng tuyến tính
+                    // gray được khai báo là kiểu byte trong khi đó tính theo phương pháp Luminance ra số thập phân
+                    byte gray1 = (byte)((R + G + B) / 3);
+                    byte gray2 = (byte)((Math.Max(R, (Math.Max(G, B))) + Math.Min(R, Math.Min(G, B))) / 2);
+                    byte gray3 = (byte)(0.2126 * R + 0.7152 * G + 0.0722 * B);
+
+
+                    // Gán giá trị mức xám vừa tính được vào hình mức xám
+                    Hinhmucxam1.SetPixel(x, y, Color.FromArgb(gray1, gray1, gray1));
+                    Hinhmucxam2.SetPixel(x, y, Color.FromArgb(gray2, gray2, gray2));
+                    Hinhmucxam3.SetPixel(x, y, Color.FromArgb(gray3, gray3, gray3));
+
+                }
+            picBox_MucXamAverage.Image   = Hinhmucxam1;
+            picBox_MucXamLightness.Image = Hinhmucxam2;
+            picBox_MucXamLuminance.Image = Hinhmucxam3;
+        }
+
+        // Khi tạo một public Bitmap (...void...) 
+        // nó không thể được chứa trực tiếp trong một khai báo lớp. Nó cần phải nằm trong một phương thức hoặc trình tạo, v.v
+        // Chính vì điều này khi cho hiển thị lên pictureBox
+        // bằng biến Hinhmucxam ( biến 'Hinhmucxam' thuộc trong hàm ChuyenAnhMauRGBSangMucXamAverage) không hiển thị lên được
+    }
+}
